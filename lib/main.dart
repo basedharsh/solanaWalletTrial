@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
+import 'package:walletconnect_flutter_v2/apis/core/pairing/utils/pairing_models.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:web3modal_flutter/services/w3m_service/w3m_service.dart';
+import 'package:web3modal_flutter/widgets/w3m_account_button.dart';
+import 'package:web3modal_flutter/widgets/w3m_connect_wallet_button.dart';
 
 void main() {
   runApp(MyApp());
@@ -28,14 +32,37 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _privateKey = 'Apni daal bsdke'; // Replace with your private key
+    _privateKey =
+        '981fcacfc9fabd1d166008f15d741560ae673a981bc076d92f4b2091c78dbb96'; // Replace with your private key
     _client = Web3Client(
         'https://sepolia.infura.io/v3/516acf4ef5da4870ad8a82d7b0154e07',
         Client());
     _contractAddress =
-        EthereumAddress.fromHex('0xd05251974CBDeBd2276A65dBeF7AA9A73D4Ea961');
+        EthereumAddress.fromHex('0x49B00c84D51F06B03E564B77b628605D9A7e607c');
     _initContract();
+    initializeWalletConnectManan();
   }
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  final _w3mService = W3MService(
+    projectId: '309e0e1dc9ec24657133cfa2c28765d9',
+    metadata: const PairingMetadata(
+      name: 'Web3Modal Flutter Example',
+      description: 'Web3Modal Flutter Example',
+      url: 'https://www.walletconnect.com/',
+      icons: ['https://walletconnect.com/walletconnect-logo.png'],
+      redirect: Redirect(
+        native: 'flutterdapp://',
+        universal: 'https://www.walletconnect.com',
+      ),
+    ),
+  );
+
+  void initializeWalletConnectManan() async {
+    await _w3mService.init();
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   _initContract() async {
     String abi = await rootBundle.loadString('assets/abi.json');
@@ -100,6 +127,7 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -142,6 +170,8 @@ class _MyAppState extends State<MyApp> {
                   _errorMessage,
                   style: TextStyle(color: Colors.red),
                 ),
+              W3MConnectWalletButton(service: _w3mService),
+              W3MAccountButton(service: _w3mService),
             ],
           ),
         ),
